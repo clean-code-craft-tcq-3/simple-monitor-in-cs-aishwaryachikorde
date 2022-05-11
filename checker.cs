@@ -1,38 +1,50 @@
 using System;
-using System.Diagnostics;
 
-class Checker
+namespace Checker
 {
-    static bool batteryIsOk(float temperature, float soc, float chargeRate) {
-        if(temperature < 0 || temperature > 45) {
-            Console.WriteLine("Temperature is out of range!");
-            return false;
-        } else if(soc < 20 || soc > 80) {
-            Console.WriteLine("State of Charge is out of range!");
-            return false;
-        } else if(chargeRate > 0.8) {
-            Console.WriteLine("Charge Rate is out of range!");
-            return false;
-        }
-        return true;
+  public class BatteryManagement: IBatteryManagement
+  {
+    public bool IsBatteryOk(float temperature, float soc, float chargeRate)
+    {
+      return IsTemperatureInRange(temperature) && IsSocInRange(soc) && IsChangeRateInRange(chargeRate);
     }
 
-    static void ExpectTrue(bool expression) {
-        if(!expression) {
-            Console.WriteLine("Expected true, but got false");
-            Environment.Exit(1);
-        }
+    private bool IsTemperatureInRange(float temperature)
+    {
+      if (temperature < 0 || temperature > 45)
+      {
+        PrintBatteryStatus("Temperatue is out of range!");
+        return false;
+      }
+
+      return true;
     }
-    static void ExpectFalse(bool expression) {
-        if(expression) {
-            Console.WriteLine("Expected false, but got true");
-            Environment.Exit(1);
-        }
+
+    private bool IsSocInRange(float stateOfCharge)
+    {
+      if (stateOfCharge < 20 || stateOfCharge > 80)
+      {
+        PrintBatteryStatus("State of Charge is out of range!");
+        return false;
+      }
+
+      return true;
     }
-    static int Main() {
-        ExpectTrue(batteryIsOk(25, 70, 0.7f));
-        ExpectFalse(batteryIsOk(50, 85, 0.0f));
-        Console.WriteLine("All ok");
-        return 0;
+
+    private bool IsChangeRateInRange(float chargeRate)
+    {
+      if (chargeRate > 0.8)
+      {
+        PrintBatteryStatus("Charge Rate is out of range!");
+        return false;
+      }
+
+      return true;
     }
+
+    private static void PrintBatteryStatus(string statusMessage)
+    {
+      Console.WriteLine(statusMessage);
+    }
+  }
 }
