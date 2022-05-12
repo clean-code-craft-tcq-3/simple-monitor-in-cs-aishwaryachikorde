@@ -15,7 +15,6 @@ namespace Checker
     private static void CheckBatteryStatus()
     {
       IBatteryManagement testBatterySpecification = new BatteryManagement();
-      Debug.Assert(testBatterySpecification.IsBatteryOk(0, 15, 3) == false);
       Debug.Assert(testBatterySpecification.IsBatteryOk(1, 21, 1) == false);
       Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 79, 0.7f) == false);
       Debug.Assert(testBatterySpecification.IsBatteryOk(2, 24, 0.6f));
