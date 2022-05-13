@@ -11,7 +11,7 @@ namespace Checker
 
     public bool IsTemperatureInRange(float temperature)
     {
-      if (IsParameterUnderLimit(45,0,temperature))
+      if (IsParameterUnderLimit(45,0,temperature) == false)
       {
         PrintBatteryStatus("Temperatue is out of range!");
         return false;
@@ -22,7 +22,7 @@ namespace Checker
 
     public bool IsSocInRange(float stateOfCharge)
     {
-      if (IsParameterUnderLimit(80, 20, stateOfCharge))
+      if (IsParameterUnderLimit(80, 20, stateOfCharge) == false)
       {
         PrintBatteryStatus("State of Charge is out of range!");
         return false;
@@ -38,7 +38,7 @@ namespace Checker
 
     private bool IsParameterUnderLimit(int maxValue, int minValue, float actualValue)
     {
-      if (actualValue >= maxValue || actualValue <= minValue)
+      if (actualValue > maxValue || actualValue <  minValue)
       {
         return false;
       }
@@ -48,7 +48,7 @@ namespace Checker
 
     public bool IsChargeRateInRange(float chargeRate)
     {
-      if (chargeRate >= 0.8)
+      if (chargeRate > 0.8f)
       {
         PrintBatteryStatus("Charge Rate is out of range!");
         return false;
