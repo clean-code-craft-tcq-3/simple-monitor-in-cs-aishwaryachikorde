@@ -6,12 +6,12 @@ namespace Checker
   {
     public bool IsBatteryOk(float temperature, float soc, float chargeRate)
     {
-      return IsTemperatureInRange(temperature) && IsSocInRange(soc) && IsChangeRateInRange(chargeRate);
+      return IsTemperatureInRange(temperature) && IsSocInRange(soc) && IsChargeRateInRange(chargeRate);
     }
 
-    private bool IsTemperatureInRange(float temperature)
+    public bool IsTemperatureInRange(float temperature)
     {
-      if (temperature < 0 || temperature > 45)
+      if (IsParameterUnderLimit(45,0,temperature))
       {
         PrintBatteryStatus("Temperatue is out of range!");
         return false;
@@ -20,9 +20,9 @@ namespace Checker
       return true;
     }
 
-    private bool IsSocInRange(float stateOfCharge)
+    public bool IsSocInRange(float stateOfCharge)
     {
-      if (stateOfCharge < 20 || stateOfCharge > 80)
+      if (IsParameterUnderLimit(80, 20, stateOfCharge))
       {
         PrintBatteryStatus("State of Charge is out of range!");
         return false;
@@ -30,21 +30,31 @@ namespace Checker
 
       return true;
     }
-
-    private bool IsChangeRateInRange(float chargeRate)
+    
+    private static void PrintBatteryStatus(string statusMessage)
     {
-      if (chargeRate > 0.8)
+      Console.WriteLine(statusMessage);
+    }
+
+    private bool IsParameterUnderLimit(int maxValue, int minValue, float actualValue)
+    {
+      if (actualValue >= maxValue || actualValue <= minValue)
       {
-        PrintBatteryStatus("Charge Rate is out of range!");
         return false;
       }
 
       return true;
     }
 
-    private static void PrintBatteryStatus(string statusMessage)
+    public bool IsChargeRateInRange(float chargeRate)
     {
-      Console.WriteLine(statusMessage);
+      if (chargeRate >= 0.8)
+      {
+        PrintBatteryStatus("Charge Rate is out of range!");
+        return false;
+      }
+
+      return true;
     }
   }
 }
