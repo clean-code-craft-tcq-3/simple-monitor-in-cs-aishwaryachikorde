@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace Checker
@@ -15,10 +15,36 @@ namespace Checker
     private static void CheckBatteryStatus()
     {
       IBatteryManagement testBatterySpecification = new BatteryManagement();
-      Debug.Assert(testBatterySpecification.IsBatteryOk(1, 21, 1) == false);
-      Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 79, 0.7f) == false);
-      Debug.Assert(testBatterySpecification.IsBatteryOk(2, 24, 0.6f));
-      Debug.Assert(testBatterySpecification.IsBatteryOk(44, 79, 0.7f));
+
+      //Check if temperature is in range
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(0));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(45));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(30));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(-3) == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(56) == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(46) == false);
+
+      //Check if State of charge is in range
+      Debug.Assert(testBatterySpecification.IsSocInRange(20));
+      Debug.Assert(testBatterySpecification.IsSocInRange(80));
+      Debug.Assert(testBatterySpecification.IsSocInRange(30));
+      Debug.Assert(testBatterySpecification.IsSocInRange(-20) == false);
+      Debug.Assert(testBatterySpecification.IsSocInRange(81) == false);
+      Debug.Assert(testBatterySpecification.IsSocInRange(19) == false);
+
+      //Check if State of charge is in range
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0));
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.8f));
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.6f));
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.9f) == false);
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.22f) == false);
+      Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.33f) == false);
+
+      Debug.Assert(testBatterySpecification.IsBatteryOk(0, 20, 0.0f));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(45, 80, 0.8f));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(3, 30, 0.6f));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 70, 0.9f) == false);
+      Debug.Assert(testBatterySpecification.IsBatteryOk(46, 81, 0.79f) == false);
     }
    }
 }
