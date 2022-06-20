@@ -57,6 +57,38 @@ namespace checker
 
       return true;
     }
+
+    //Extended Operations
+    public bool IsValueInWarningRange(int maxValue, int minValue, float actualValue)
+    {
+      float warningTolerance = maxValue * 0.05f;
+      float lowerLimit = minValue + warningTolerance;
+      float upperLimit = maxValue - warningTolerance;
+
+      if (IsParameterUnderLimit(maxValue, minValue, actualValue) == false)
+      {
+        PrintBatteryStatus("Warning!!!! Battery levels exceeding the threshold.");
+        return false;
+      }
+
+      return true;
+    }
+
+    public bool IsChargeRateInWarningRange(float maxValue, float actualValue)
+    {
+      float warningTolerance = maxValue * 0.05f;
+      float upperLimit = maxValue - warningTolerance;
+
+      if (actualValue > upperLimit)
+      {
+        PrintBatteryStatus("Warning!!!! Charge Rate exceeding the threshold");
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
   }
 
   public interface IBatteryManagement
@@ -68,6 +100,10 @@ namespace checker
     bool IsSocInRange(float stateOfCharge);
 
     bool IsChargeRateInRange(float chargeRate);
+
+    bool IsValueInWarningRange(int maxValue, int minValue, float actualValue);
+
+    bool IsChargeRateInWarningRange(float maxValue, float actualValue);
   }
 
   public class BatterySystemUnitTest
@@ -101,7 +137,7 @@ namespace checker
       Debug.Assert(testBatterySpecification.IsSocInRange(81) == false);
       Debug.Assert(testBatterySpecification.IsSocInRange(19) == false);
 
-      ////Check if State of charge is in range
+      ////Check if Charge Rate is in range
       Debug.Assert(testBatterySpecification.IsChargeRateInRange(0));
       Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.8f));
       Debug.Assert(testBatterySpecification.IsChargeRateInRange(0.6f));
@@ -109,11 +145,30 @@ namespace checker
       Debug.Assert(testBatterySpecification.IsChargeRateInRange(1.22f) == false);
       Debug.Assert(testBatterySpecification.IsChargeRateInRange(2.33f) == false);
 
+
+      //Test the overall battery
       Debug.Assert(testBatterySpecification.IsBatteryOk(0, 20, 0.0f));
       Debug.Assert(testBatterySpecification.IsBatteryOk(45, 80, 0.8f));
       Debug.Assert(testBatterySpecification.IsBatteryOk(3, 30, 0.6f));
       Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 70, 0.9f) == false);
       Debug.Assert(testBatterySpecification.IsBatteryOk(46, 81, 0.79f) == false);
+
+
+      //Extended Tests
+      //Temperature
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(45, 0, 2.2f));
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(45, 0, 130f) == false);
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(45, 0, 43f));
+
+      // State of Charge
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(80, 20, 77));
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(80, 20, 45));
+      Debug.Assert(testBatterySpecification.IsValueInWarningRange(80, 20, 23));
+
+      // Charge Rate
+      Debug.Assert(testBatterySpecification.IsChargeRateInWarningRange(0.8f, 0.4f));
+      Debug.Assert(testBatterySpecification.IsChargeRateInWarningRange(0.8f, 0.77f) == false); 
     }
   }
  }
+
