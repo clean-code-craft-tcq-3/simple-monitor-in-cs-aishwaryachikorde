@@ -5,13 +5,18 @@ namespace checker
 {
   public class BatteryManagement: IBatteryManagement
   {
-    public bool IsBatteryOk(float temperature, float soc, float chargeRate)
+    public bool IsBatteryOk(float temperature, float soc, float chargeRate, char temperatureUnit)
     {
-      return IsTemperatureInRange(temperature) && IsSocInRange(soc) && IsChargeRateInRange(chargeRate);
+      return IsTemperatureInRange(temperature, temperatureUnit) && IsSocInRange(soc) && IsChargeRateInRange(chargeRate);
     }
 
-    public bool IsTemperatureInRange(float temperature)
+    public bool IsTemperatureInRange(float temperature, char temperatureUnit)
     {
+      if (temperatureUnit == 'F')
+      {
+        ConvertTemperatureToCelsius(temperature);
+      }
+
       if (IsParameterUnderLimit(45,0,temperature) == false)
       {
         PrintBatteryStatus("Temperatue is out of range!");
@@ -37,7 +42,7 @@ namespace checker
       Console.WriteLine(statusMessage);
     }
 
-    private bool IsParameterUnderLimit(int maxValue, int minValue, float actualValue)
+    private bool IsParameterUnderLimit(float maxValue, float minValue, float actualValue)
     {
       if (actualValue > maxValue || actualValue <  minValue)
       {
@@ -65,7 +70,7 @@ namespace checker
       float lowerLimit = minValue + warningTolerance;
       float upperLimit = maxValue - warningTolerance;
 
-      if (IsParameterUnderLimit(maxValue, minValue, actualValue) == false)
+      if (IsParameterUnderLimit(upperLimit, lowerLimit, actualValue) == false)
       {
         PrintBatteryStatus("Warning!!!! Battery levels exceeding the threshold.");
         return false;
@@ -89,13 +94,18 @@ namespace checker
         return true;
       }
     }
+
+    private void ConvertTemperatureToCelsius(float temperature)
+    {
+      temperature = (temperature - 32) * (5 / 9);
+    }
   }
 
   public interface IBatteryManagement
   {
-    bool IsBatteryOk(float temperature, float stateOfCharge, float chargeRate);
+    bool IsBatteryOk(float temperature, float stateOfCharge, float chargeRate, char temperatureUnit);
 
-    bool IsTemperatureInRange(float temperature);
+    bool IsTemperatureInRange(float temperature, char temperatureUnit);
 
     bool IsSocInRange(float stateOfCharge);
 
@@ -120,14 +130,17 @@ namespace checker
       IBatteryManagement testBatterySpecification = new BatteryManagement();
 
       //Check if temperature is in range
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(0));
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(45));
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(18));
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(20));
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(44));
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(-3) == false);
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(46) == false);
-      Debug.Assert(testBatterySpecification.IsTemperatureInRange(55) == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(0, 'C'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(113, 'F'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(18, 'C'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(68, 'F'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(44, 'C'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(111.2f, 'F'));
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(-3, 'C') == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(46, 'C') == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(55, 'C') == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(140, 'F') == false);
+      Debug.Assert(testBatterySpecification.IsTemperatureInRange(167, 'F') == false);
 
       //Check if State of charge is in range
       Debug.Assert(testBatterySpecification.IsSocInRange(20));
@@ -147,11 +160,12 @@ namespace checker
 
 
       //Test the overall battery
-      Debug.Assert(testBatterySpecification.IsBatteryOk(0, 20, 0.0f));
-      Debug.Assert(testBatterySpecification.IsBatteryOk(45, 80, 0.8f));
-      Debug.Assert(testBatterySpecification.IsBatteryOk(3, 30, 0.6f));
-      Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 70, 0.9f) == false);
-      Debug.Assert(testBatterySpecification.IsBatteryOk(46, 81, 0.79f) == false);
+      Debug.Assert(testBatterySpecification.IsBatteryOk(0, 20, 0.0f, 'C'));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(113, 80, 0.8f, 'F'));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(3, 30, 0.6f, 'C'));
+      Debug.Assert(testBatterySpecification.IsBatteryOk(-1, 70, 0.9f, 'C') == false);
+      Debug.Assert(testBatterySpecification.IsBatteryOk(46, 81, 0.79f, 'C') == false);
+      Debug.Assert(testBatterySpecification.IsBatteryOk(122, 81, 0.79f, 'F') == false);
 
 
       //Extended Tests
@@ -171,4 +185,3 @@ namespace checker
     }
   }
  }
-
